@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from typing import List
 import pickle
+import sys 
+
+import click
 
 BIG_EXPENSE_THRESHOLD = 1000
 DB_FILENAME = 'budget.db'
@@ -36,3 +39,27 @@ def find_next_id(expenses: List[Expense]) -> int:
     while next_id in all_ids:
         next_id += 1
     return next_id
+
+@click.group()
+def cli():
+    pass  
+
+@cli.command()
+@click.argument('amount', type=int) 
+@click.argument('description') 
+def add(amount: int, description: str) -> None:
+    expenses = load_or_init()
+
+    try:
+        new_expense = Expense(
+            id=find_next_id(expenses),
+            amount=amount,
+            description=description
+        )
+    except ValueError as e:
+        print(f'error: {e.args[0]}')
+        sys.exit(1)
+
+    expenses.append(new_expense)
+    save_expenses(expenses)
+    print('added:)')
