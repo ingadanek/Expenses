@@ -25,3 +25,14 @@ def load_or_init() -> List[Expense]:
     except FileNotFoundError:
         expenses = []
     return expenses
+
+def save_expenses(expenses: List[Expense]) -> None: 
+    with open(DB_FILENAME, 'wb') as stream:
+        pickle.dump(expenses, stream)
+
+def find_next_id(expenses: List[Expense]) -> int:
+    all_ids = {expense.id for expense in expenses}
+    next_id = 1
+    while next_id in all_ids:
+        next_id += 1
+    return next_id
