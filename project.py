@@ -1,6 +1,9 @@
 from dataclasses import dataclass
+from typing import List
+import pickle
 
-
+BIG_EXPENSE_THRESHOLD = 1000
+DB_FILENAME = 'budget.db'
 
 @dataclass
 class Expense:
@@ -15,3 +18,10 @@ class Expense:
     def is_big(self) -> bool:
         return self.amount >= BIG_EXPENSE_THRESHOLD
 
+def load_or_init() -> List[Expense]:
+    try:  
+        with open(DB_FILENAME, 'rb') as stream:
+            expenses = pickle.load(stream)
+    except FileNotFoundError:
+        expenses = []
+    return expenses
