@@ -40,9 +40,35 @@ def find_next_id(expenses: List[Expense]) -> int:
         next_id += 1
     return next_id
 
+def compute_total(expenses):
+    total_list = [expense.amount for expense in expenses]
+    total = sum(total_list)
+    return total
+
+def print_report(expenses: List[Expense], total: int) -> None:
+    if expenses:
+        print(f'--ID--  -AMOUNT-  -BIG?-  --DESC------')
+        for expense in expenses:
+            if expense.is_big():
+                big = '(!)'
+            else:
+                big = ''
+            print(f'{expense.id:6} {expense.amount:8} {big:^10} {expense.description}')
+        
+        print(f'TOTAL: {total:8}')
+    else:
+        print('You did not provide any expenses yet')
+
 @click.group()
 def cli():
     pass  
+
+@cli.command()
+def report() -> None:
+    expenses = load_or_init()
+    total = compute_total(expenses)
+    print_report(expenses, total)
+
 
 @cli.command()
 @click.argument('amount', type=int) 
