@@ -1,3 +1,4 @@
+import csv
 from dataclasses import dataclass
 from typing import List
 import pickle
@@ -89,3 +90,36 @@ def add(amount: int, description: str) -> None:
     expenses.append(new_expense)
     save_expenses(expenses)
     print('added:)')
+
+
+@cli.command()
+def export_python() -> None:
+    expenses = load_or_init()
+    print(expenses)  
+
+@cli.command()
+@click.argument('csv_file') 
+def import_csv(csv_file: str) -> List[Expense]:
+    expenses = load_or_init()
+
+    try:
+        with open(csv_file) as stream:
+            reader = csv.DictReader(stream)
+            for row in reader:
+                expense = Expense(
+                    id = find_next_id(expenses),
+                    amount = float(row['amount']),
+                    description = row['description']
+                )
+                expenses.append(expense)
+    except FileNotFoundError:
+        print('This file does not exist.')
+        sys.exit(1)
+
+
+    save_expenses(expenses)
+    print(f'the file was imported')
+ 
+
+if __name__ == "__main__":
+    cli()
